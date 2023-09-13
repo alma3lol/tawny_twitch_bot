@@ -13,11 +13,7 @@ export class AppController {
   @Get()
   async main(@Res() res: Response) {
     try {
-      const token = await this.prismaService.token.findFirst({
-        where: {
-          expires_at: { gt: new Date() },
-        },
-      });
+      const token = await this.prismaService.token.findFirst();
       try {
         await this.appService.validateToken(token.access_token);
         this.appService.startBot(token.access_token);
