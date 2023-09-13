@@ -10,3 +10,10 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Token {
+  id            Int      @id @default(autoincrement())
+  access_token  String   @unique
+  expires_at    DateTime
+  refresh_token String   @unique
+}

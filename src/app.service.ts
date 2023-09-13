@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Axios from 'axios';
 import { Client } from 'tmi.js';
+import { PrismaClient } from '../src/generated/client';
 
 type TwitchOAuth2TokenResponse = {
   access_token: string;
@@ -16,6 +17,13 @@ type TwitchOAuth2ValidationResponse = {
   client_id: string;
   login: string;
   user_id: string;
+};
+
+type TwitchOAuth2RefreshResponse = {
+  access_token: string;
+  refresh_token: string;
+  scope: string[];
+  token_type: string;
 };
 
 @Injectable()
@@ -50,6 +58,20 @@ export class AppService {
     return response.data;
   };
 
+  refreshToken = async (refresh_token: string) => {
+    const response = await Axios.post<TwitchOAuth2RefreshResponse>(
+      'https://id.twitch.tv/oauth2/token',
+      `client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${refresh_token}`,
+      {
+        responseType: 'json',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    );
+    return response.data;
+  };
+
   startBot = async (access_token: string) => {
     const client = new Client({
       options: { debug: true },
@@ -76,3 +98,6 @@ export class AppService {
     });
   };
 }
+
+@Injectable()
+export class PrismaService extends PrismaClient {}
