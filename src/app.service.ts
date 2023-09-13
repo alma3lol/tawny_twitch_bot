@@ -87,8 +87,35 @@ export class AppService {
     client.on('chat', (channel, user, message, self) => {
       if (self) return;
       if (user['message-type'] === 'chat') {
-        if (message.toLowerCase() === '!hello') {
-          client.say(channel, `@${user.username}, heya!`);
+        const commandRegex = new RegExp(/^!([a-zA-Z0-9]+)(?:\W+)?(.*)?/);
+        const [_raw, command, args] = message.match(commandRegex);
+        switch (command.toLowerCase()) {
+          case 'help':
+            client.say(
+              channel,
+              `@${user.username} call 911 instead of chatting here!`,
+            );
+            break;
+          case 'hello':
+            client.say(channel, `@${user.username}, heya!`);
+            break;
+          case 'milk':
+            if (user.badges.broadcaster === '1') {
+              let width = 3;
+              try {
+                width = parseInt(args.trim());
+                if (width > 5) width = 5;
+              } catch (_e) {}
+              for (let i = 0; i < width; i++) {
+                client.say(channel, 'milk '.repeat(i + 1).trim());
+              }
+              for (let i = width - 1; i > 0; i--) {
+                client.say(channel, 'milk '.repeat(i).trim());
+              }
+            }
+            break;
+          default:
+            break;
         }
       }
     });
