@@ -5,7 +5,6 @@
   "author": "Omar Almalol<omar.alma3lol@gmail.com>",
   "private": true,
   "license": "MIT",
-  "packageManager": "^pnpm@8.7.5",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
