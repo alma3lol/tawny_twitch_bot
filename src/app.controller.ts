@@ -16,7 +16,7 @@ export class AppController {
       const token = await this.prismaService.token.findFirst();
       try {
         await this.appService.validateToken(token.access_token);
-        this.appService.startBot(token.access_token);
+        this.appService.startBot(token.access_token, this.prismaService);
       } catch (_e) {
         const result = await this.appService.refreshToken(token.refresh_token);
         await this.prismaService.token.update({
@@ -26,7 +26,7 @@ export class AppController {
             refresh_token: result.refresh_token,
           },
         });
-        this.appService.startBot(result.access_token);
+        this.appService.startBot(result.access_token, this.prismaService);
       }
       return res.render('success', {});
     } catch (_e) {

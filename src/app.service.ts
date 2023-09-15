@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import Axios from 'axios';
 import { Client } from 'tmi.js';
 import { PrismaClient } from '../src/generated/client';
+import { BotSubject } from './subjects';
 
 type TwitchOAuth2TokenResponse = {
   access_token: string;
@@ -72,57 +73,20 @@ export class AppService {
     return response.data;
   };
 
-  startBot = async (access_token: string) => {
+  startBot = async (access_token: string, prismaService: PrismaService) => {
     const client = new Client({
       options: { debug: true },
       identity: {
         username: process.env.BOT_USERNAME,
         password: access_token,
       },
-      channels: [process.env.CHANNEL],
+      channels: process.env.CHANNEL.split(','),
     });
 
     client.connect();
 
-    client.on('chat', (channel, user, message, self) => {
-      if (self) return;
-      if (user['message-type'] === 'chat') {
-        const commandRegex = new RegExp(/^!([a-zA-Z0-9]+)(?:\W+)?(.*)?/);
-        const [_raw, command, args] = message.match(commandRegex);
-        switch (command.toLowerCase()) {
-          case 'help':
-            client.say(
-              channel,
-              `@${user.username} call 911 instead of chatting here!`,
-            );
-            break;
-          case 'hello':
-            client.say(channel, `@${user.username}, heya!`);
-            break;
-          case 'milk':
-            if (user.badges.broadcaster === '1') {
-              let width = 3;
-              try {
-                width = parseInt(args.trim());
-                if (width > 5) width = 5;
-              } catch (_e) {}
-              for (let i = 0; i < width; i++) {
-                client.say(channel, 'milk '.repeat(i + 1).trim());
-              }
-              for (let i = width - 1; i > 0; i--) {
-                client.say(channel, 'milk '.repeat(i).trim());
-              }
-            }
-            break;
-          default:
-            break;
-        }
-      }
-    });
-    client.on('join', (channel, username, self) => {
-      if (self) return;
-      client.say(channel, `Welcome aboard @${username}`);
-    });
+    // const botSubject = new BotSubject(client, prismaService);
+    new BotSubject(client, prismaService);
   };
 }
 
