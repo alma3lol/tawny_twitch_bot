@@ -18,7 +18,7 @@ export class AddCommand extends Command {
                 answer: { create: { answer, options: '' } },
               },
             });
-            this.client.say(this.channel, `Question added.`);
+            this.channelSubject.next(`Question added.`);
             break;
           case 'options':
             await this.prismaService.question.create({
@@ -38,19 +38,17 @@ export class AddCommand extends Command {
                 },
               },
             });
-            this.client.say(this.channel, `Question added.`);
+            this.channelSubject.next(`Question added.`);
             break;
           default:
-            this.client.say(
-              this.channel,
+            this.channelSubject.next(
               `Question type (${this.args[1]}) is invalid. Try !help add.`,
             );
             break;
         }
         break;
       default:
-        this.client.say(
-          this.channel,
+        this.channelSubject.next(
           `Add type (${this.args[0]}) is invalid. Try !help add.`,
         );
         break;

@@ -1,4 +1,4 @@
-import { Subject, delay, of, timer } from 'rxjs';
+import { Subject, of, timer } from 'rxjs';
 import { Answer, Game, Question, User } from '../../src/generated/client';
 import { UserSubject } from './user.subject';
 import { ChatUserstate, Client } from 'tmi.js';
@@ -6,6 +6,7 @@ import { PrismaService } from 'src/app.service';
 import * as moment from 'moment';
 import { EndCommand } from 'src/commands';
 import * as _ from 'lodash';
+import { ChannelSubject } from './channel.subject';
 
 export class GameSubject extends Subject<Question & { answer: Answer }> {
   private players = new Map<string, UserSubject>();
@@ -18,13 +19,13 @@ export class GameSubject extends Subject<Question & { answer: Answer }> {
     private readonly firstQuestion: Question & { answer: Answer },
     private readonly client: Client,
     private readonly prismaService: PrismaService,
-    private readonly channel: string,
+    private readonly channelSubject: ChannelSubject,
     private readonly user: ChatUserstate,
   ) {
     super();
     this.question = this.firstQuestion;
     this.client.on('message', async (channel, user, msg, self) => {
-      if (self || channel !== this.channel) return;
+      if (self || channel !== this.channelSubject.channel) return;
       if (
         msg.trim().toLowerCase() !==
           this.question.answer.answer.trim().toLowerCase() &&
@@ -76,56 +77,45 @@ export class GameSubject extends Subject<Question & { answer: Answer }> {
           msgs.push(`${i + 1} - ${option}`);
         });
       }
-      of(...msgs)
-        .pipe(delay(1000))
-        .subscribe({
-          next: (msg) => {
-            this.client.say(this.channel, msg);
-          },
-          complete: () => {
+      of(...msgs).subscribe({
+        next: (msg) => {
+          this.channelSubject.next(msg);
+        },
+        complete: () => {
+          this.channelSubject.next(
+            `You should answer ${moment().add(question.timer, 's').fromNow()}.`,
+          );
+          timer(Math.floor(question.timer / 2) * 1000).subscribe(() => {
             this.client.say(
-              this.channel,
-              `You should answer ${moment()
-                .add(question.timer, 's')
-                .fromNow()}.`,
+              this.channelSubject.channel,
+              `Half the time passed. Know the answer yet?`,
             );
-            timer(Math.floor(question.timer / 2) * 1000).subscribe(() => {
-              this.client.say(
-                this.channel,
-                `Half the time passed. Know the answer yet?`,
-              );
-              of(...msgs)
-                .pipe(delay(1000))
-                .subscribe((msg) => {
-                  this.client.say(this.channel, msg);
-                });
+            msgs.forEach((msg) => {
+              this.channelSubject.next(msg);
             });
-            timer(question.timer * 1000).subscribe(async () => {
-              this.client.say(this.channel, `Time's up for this question.`);
-              try {
-                const q = await this.pickAQuestion();
-                timer(1000).subscribe(() => {
-                  this.client.say(this.channel, `Next question...`);
-                  this.next(q);
-                });
-              } catch (_e) {
-                timer(1000).subscribe(async () => {
-                  this.client.say(this.channel, `That was the last question.`);
-                  this.players.forEach((player) => {
-                    player.next('SAVE_SCORE');
-                  });
-                  await new EndCommand(
-                    this.client,
-                    this.prismaService,
-                    [],
-                    this.channel,
-                    this.user,
-                  ).Command();
-                });
-              }
-            });
-          },
-        });
+          });
+          timer(question.timer * 1000).subscribe(async () => {
+            this.channelSubject.next(`Time's up for this question.`);
+            try {
+              const q = await this.pickAQuestion();
+              this.channelSubject.next(`Next question...`);
+              this.next(q);
+            } catch (_e) {
+              this.channelSubject.next(`That was the last question.`);
+              this.players.forEach((player) => {
+                player.next('SAVE_SCORE');
+              });
+              await new EndCommand(
+                this.client,
+                this.prismaService,
+                [],
+                this.channelSubject,
+                this.user,
+              ).Command();
+            }
+          });
+        },
+      });
       this.previousQuesionsIds.push(question.id);
       this.question = question;
     });

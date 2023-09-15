@@ -9,8 +9,7 @@ export class StartCommand extends Command {
         try {
           const count = await this.prismaService.question.count();
           if (count === 0) {
-            this.client.say(
-              this.channel,
+            this.channelSubject.next(
               `There are no questions yet! @${this.user.username} please add some questions with '!add question <...>'. See !help add`,
             );
             return;
@@ -19,17 +18,14 @@ export class StartCommand extends Command {
             where: { ended: false },
           });
           if (currentGame === null) throw new Error();
-          this.client.say(this.channel, `A game is already in progress`);
-          this.client.say(
-            this.channel,
-            `You can end the current game with !end`,
-          );
+          this.channelSubject.next(`A game is already in progress`);
+          this.channelSubject.next(`You can end the current game with !end`);
         } catch (_e) {
           try {
             const game = await this.prismaService.game.create({
               data: {
                 type: 'Questions',
-                channel: this.channel,
+                channel: this.channelSubject.channel,
                 starter: {
                   connectOrCreate: {
                     where: { username: this.user.username },
@@ -39,29 +35,27 @@ export class StartCommand extends Command {
               },
               include: { starter: true },
             });
-            this.client.say(this.channel, `Starting game ${game.type}.`);
+            this.channelSubject.next(`Starting game ${game.type}.`);
             const question = await this.pickAQuestion();
             const gameSubject = new GameSubject(
               game,
               question,
               this.client,
               this.prismaService,
-              this.channel,
+              this.channelSubject,
               this.user,
             );
             gameSubject.next(question);
           } catch (e) {
             console.log(e);
-            this.client.say(
-              this.channel,
+            this.channelSubject.next(
               `Failed to create the game! Check console for info.`,
             );
           }
         }
         break;
       default:
-        this.client.say(
-          this.channel,
+        this.channelSubject.next(
           `Game type (${gameType}) is invalid. Valid type are: [questions].`,
         );
         break;

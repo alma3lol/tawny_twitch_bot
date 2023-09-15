@@ -15,13 +15,13 @@ export class EndCommand extends Command {
       });
       this.endGame(game);
     } catch (_e) {
-      this.client.say(this.channel, `There is no active game!`);
+      this.channelSubject.next(`There is no active game!`);
     }
   }
 
   endGame = async (game: Game & { scores: Score[] }) => {
-    this.client.say(
-      this.channel,
+    this.channelSubject.next(
+      
       `Game ${game.type} has ended. And the winner is...`,
     );
     setTimeout(async () => {
@@ -31,12 +31,12 @@ export class EndCommand extends Command {
         include: { user: true },
       });
       if (winner === null || winner.score === 0) {
-        this.client.say(this.channel, `No one :) Shame on you :)`);
+        this.channelSubject.next(`No one :) Shame on you :)`);
       } else {
         const winnerText = `🎉 @${winner.user.username} 🎉`;
-        this.client.say(this.channel, `🎉`.repeat(winnerText.length / 2));
-        this.client.say(this.channel, winnerText);
-        this.client.say(this.channel, `🎉`.repeat(winnerText.length / 2));
+        this.channelSubject.next(`🎉`.repeat(winnerText.length / 2));
+        this.channelSubject.next(winnerText);
+        this.channelSubject.next(`🎉`.repeat(winnerText.length / 2));
       }
     }, 3000);
   };

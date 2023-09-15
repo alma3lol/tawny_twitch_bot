@@ -10,8 +10,10 @@ import {
   MilkCommand,
 } from 'src/commands';
 import { Command } from 'src/command.class';
+import { ChannelSubject } from './channel.subject';
 
 export class BotSubject extends Subject<any> {
+  private channels = new Map<string, ChannelSubject>();
   constructor(
     private readonly client: Client,
     private readonly prismaService: PrismaService,
@@ -20,6 +22,10 @@ export class BotSubject extends Subject<any> {
     this.client.on('chat', async (channel, user, message, self) => {
       if (self) return;
       if (user['message-type'] === 'chat' && message.startsWith('!')) {
+        if (!this.channels.has(channel)) {
+          this.channels.set(channel, new ChannelSubject(this.client, channel));
+        }
+        const channelSubject = this.channels.get(channel);
         const commandRegex = new RegExp(/^!([a-zA-Z0-9]+)(?:\W+)?(.*)?/);
         const [, command, args_full] = message.trim().match(commandRegex);
         const args =
@@ -31,7 +37,7 @@ export class BotSubject extends Subject<any> {
             client: Client,
             prismaService: PrismaService,
             args: string[],
-            channel: string,
+            channelSubject: ChannelSubject,
             user: ChatUserstate,
           ) => Command;
         };
@@ -55,7 +61,7 @@ export class BotSubject extends Subject<any> {
             this.client,
             this.prismaService,
             args,
-            channel,
+            channelSubject,
             user,
           ).Command();
         if (cmd in generalCommands)
@@ -63,14 +69,18 @@ export class BotSubject extends Subject<any> {
             this.client,
             this.prismaService,
             args,
-            channel,
+            channelSubject,
             user,
           ).Command();
       }
     });
     this.client.on('join', (channel, username, self) => {
       if (self) return;
-      // this.client.say(channel, `Welcome @${username}`);
+      // if (!this.channels.has(channel)) {
+      //   this.channels.set(channel, new ChannelSubject(this.client, channel));
+      // }
+      // const channelSubject = this.channels.get(channel);
+      // channelSubject.next(`Welcome @${username}`);
     });
   }
 }
