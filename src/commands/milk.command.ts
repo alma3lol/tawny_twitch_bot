@@ -9,10 +9,10 @@ export class MilkCommand extends Command {
       if (width > 5) width = 5;
     } catch (_e) {}
     for (let i = 0; i < width; i++) {
-      this.channelSubject.next('milk '.repeat(i + 1).trim());
+      this.channelSubject.next({ type: 'DELAYED_MESSAGE', msg: 'milk '.repeat(i + 1).trim() })
     }
     for (let i = width - 1; i > 0; i--) {
-      this.channelSubject.next('milk '.repeat(i).trim());
+      this.channelSubject.next({ type: 'DELAYED_MESSAGE', msg: 'milk '.repeat(i).trim() })
     }
   }
 }

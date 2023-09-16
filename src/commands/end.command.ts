@@ -15,15 +15,18 @@ export class EndCommand extends Command {
       });
       this.endGame(game);
     } catch (_e) {
-      this.channelSubject.next(`There is no active game!`);
+      this.channelSubject.next({
+        type: 'DELAYED_MESSAGE',
+        msg: `There is no active game!`,
+      });
     }
   }
 
   endGame = async (game: Game & { scores: Score[] }) => {
-    this.channelSubject.next(
-      
-      `Game ${game.type} has ended. And the winner is...`,
-    );
+    this.channelSubject.next({
+      type: 'DELAYED_MESSAGE',
+      msg: `Game ${game.type} has ended. And the winner is...`,
+    });
     setTimeout(async () => {
       const winner = await this.prismaService.score.findFirst({
         where: { game: { id: game.id } },
@@ -31,12 +34,21 @@ export class EndCommand extends Command {
         include: { user: true },
       });
       if (winner === null || winner.score === 0) {
-        this.channelSubject.next(`No one :) Shame on you :)`);
+        this.channelSubject.next({
+          type: 'DELAYED_MESSAGE',
+          msg: `No one :) Shame on you :)`,
+        });
       } else {
         const winnerText = `🎉 @${winner.user.username} 🎉`;
-        this.channelSubject.next(`🎉`.repeat(winnerText.length / 2));
-        this.channelSubject.next(winnerText);
-        this.channelSubject.next(`🎉`.repeat(winnerText.length / 2));
+        this.channelSubject.next({
+          type: 'DELAYED_MESSAGE',
+          msg: `🎉`.repeat(winnerText.length / 2),
+        });
+        this.channelSubject.next({ type: 'DELAYED_MESSAGE', msg: winnerText });
+        this.channelSubject.next({
+          type: 'DELAYED_MESSAGE',
+          msg: `🎉`.repeat(winnerText.length / 2),
+        });
       }
     }, 3000);
   };

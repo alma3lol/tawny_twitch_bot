@@ -76,11 +76,19 @@ export class BotSubject extends Subject<any> {
     });
     this.client.on('join', (channel, username, self) => {
       if (self) return;
-      // if (!this.channels.has(channel)) {
-      //   this.channels.set(channel, new ChannelSubject(this.client, channel));
-      // }
-      // const channelSubject = this.channels.get(channel);
-      // channelSubject.next(`Welcome @${username}`);
+      if (!this.channels.has(channel)) {
+        this.channels.set(channel, new ChannelSubject(this.client, channel));
+      }
+      const channelSubject = this.channels.get(channel);
+      channelSubject.next({ type: 'USER_JOINED', username });
+    });
+    this.client.on('part', (channel, username, self) => {
+      if (self) return;
+      if (!this.channels.has(channel)) {
+        this.channels.set(channel, new ChannelSubject(this.client, channel));
+      }
+      const channelSubject = this.channels.get(channel);
+      channelSubject.next({ type: 'USER_LEFT', username });
     });
   }
 }
