@@ -1,6 +1,6 @@
-import { Subject } from 'rxjs';
-import { PrismaService } from '../app.service';
-import { ChatUserstate, Client } from 'tmi.js';
+import { Subject } from "rxjs";
+import { PrismaService } from "../services";
+import { ChatUserstate, Client } from "tmi.js";
 import {
   AddCommand,
   EndCommand,
@@ -8,37 +8,40 @@ import {
   HelloCommand,
   HelpCommand,
   MilkCommand,
-} from '../commands';
-import { Command } from '../command.class';
-import { ChannelSubject } from './channel.subject';
+} from "../commands";
+import { Command } from "../command.class";
+import { ChannelSubject } from "./channel.subject";
 
-export class BotSubject extends Subject<any> {
+export class BotSubject extends Subject<boolean> {
   private channels = new Map<string, ChannelSubject>();
   constructor(
     private readonly client: Client,
-    private readonly prismaService: PrismaService,
+    private readonly prismaService: PrismaService
   ) {
     super();
-    this.client.on('chat', async (channel, user, message, self) => {
+    this.client.on("chat", async (channel, user, message, self) => {
       if (self) return;
-      if (user['message-type'] === 'chat' && message.startsWith('!')) {
+      if (user["message-type"] === "chat" && message.startsWith("!")) {
         if (!this.channels.has(channel)) {
           this.channels.set(channel, new ChannelSubject(this.client, channel));
         }
         const channelSubject = this.channels.get(channel);
+        if (channelSubject === undefined) return;
         const commandRegex = new RegExp(/^!([a-zA-Z0-9]+)(?:\W+)?(.*)?/);
-        const [, command, args_full] = message.trim().match(commandRegex);
+        const matched = message.trim().match(commandRegex);
+        if (matched === null) return;
+        const [, command, args_full] = matched;
         const args =
-          args_full === '' || args_full == undefined
+          args_full === "" || args_full == undefined
             ? []
-            : args_full.split(' ');
+            : args_full.split(" ");
         type CommandsObj = {
           [key: string]: new (
             client: Client,
             prismaService: PrismaService,
             args: string[],
             channelSubject: ChannelSubject,
-            user: ChatUserstate,
+            user: ChatUserstate
           ) => Command;
         };
         const broadcasterCommands: CommandsObj = {
@@ -55,14 +58,14 @@ export class BotSubject extends Subject<any> {
         if (
           cmd in broadcasterCommands &&
           user.badges !== null &&
-          user.badges.broadcaster === '1'
+          user.badges?.broadcaster === "1"
         )
           new broadcasterCommands[cmd](
             this.client,
             this.prismaService,
             args,
             channelSubject,
-            user,
+            user
           ).Command();
         if (cmd in generalCommands)
           new generalCommands[cmd](
@@ -70,25 +73,27 @@ export class BotSubject extends Subject<any> {
             this.prismaService,
             args,
             channelSubject,
-            user,
+            user
           ).Command();
       }
     });
-    this.client.on('join', (channel, username, self) => {
+    this.client.on("join", (channel, username, self) => {
       if (self) return;
       if (!this.channels.has(channel)) {
         this.channels.set(channel, new ChannelSubject(this.client, channel));
       }
       const channelSubject = this.channels.get(channel);
-      channelSubject.next({ type: 'USER_JOINED', username });
+      if (channelSubject === undefined) return;
+      channelSubject.next({ type: "USER_JOINED", username });
     });
-    this.client.on('part', (channel, username, self) => {
+    this.client.on("part", (channel, username, self) => {
       if (self) return;
       if (!this.channels.has(channel)) {
         this.channels.set(channel, new ChannelSubject(this.client, channel));
       }
       const channelSubject = this.channels.get(channel);
-      channelSubject.next({ type: 'USER_LEFT', username });
+      if (channelSubject === undefined) return;
+      channelSubject.next({ type: "USER_LEFT", username });
     });
   }
 }
