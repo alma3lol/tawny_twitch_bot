@@ -4,7 +4,7 @@ import { Client } from 'tmi.js';
 import { PrismaClient } from '../src/generated/client';
 import { BotSubject } from './subjects';
 
-type TwitchOAuth2TokenResponse = {
+export type TwitchOAuth2TokenResponse = {
   access_token: string;
   expires_in: number;
   refresh_token: string;
@@ -12,7 +12,7 @@ type TwitchOAuth2TokenResponse = {
   token_type: string;
 };
 
-type TwitchOAuth2ValidationResponse = {
+export type TwitchOAuth2ValidationResponse = {
   expires_in: number;
   scope: string[];
   client_id: string;
@@ -20,7 +20,7 @@ type TwitchOAuth2ValidationResponse = {
   user_id: string;
 };
 
-type TwitchOAuth2RefreshResponse = {
+export type TwitchOAuth2RefreshResponse = {
   access_token: string;
   refresh_token: string;
   scope: string[];
@@ -74,6 +74,7 @@ export class AppService {
   };
 
   startBot = async (access_token: string, prismaService: PrismaService) => {
+    if (process.env.NODE_ENV === 'test') return;
     const client = new Client({
       options: { debug: true },
       identity: {

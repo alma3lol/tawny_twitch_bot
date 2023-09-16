@@ -1,4 +1,4 @@
-import { Command } from 'src/command.class';
+import { Command } from '../command.class';
 import { Game, Score } from '../../src/generated/client';
 
 export class EndCommand extends Command {

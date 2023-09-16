@@ -1,4 +1,4 @@
-import { Command } from 'src/command.class';
+import { Command } from '../command.class';
 
 export class HelloCommand extends Command {
   Command(): void {

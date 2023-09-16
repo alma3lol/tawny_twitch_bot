@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs';
-import { PrismaService } from 'src/app.service';
+import { PrismaService } from '../app.service';
 import { ChatUserstate, Client } from 'tmi.js';
 import {
   AddCommand,
@@ -8,8 +8,8 @@ import {
   HelloCommand,
   HelpCommand,
   MilkCommand,
-} from 'src/commands';
-import { Command } from 'src/command.class';
+} from '../commands';
+import { Command } from '../command.class';
 import { ChannelSubject } from './channel.subject';
 
 export class BotSubject extends Subject<any> {
