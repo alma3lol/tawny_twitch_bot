@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
 import { Game, User } from '../../src/generated/client';
-import { PrismaService } from 'src/app.service';
+import { PrismaService } from '../app.service';
 
 export class UserSubject extends Subject<number | 'SAVE_SCORE'> {
   private score = 0;

@@ -5,8 +5,8 @@
   "author": "Omar Almalol<omar.alma3lol@gmail.com>",
   "private": true,
   "license": "MIT",
-  "packageManager": "^pnpm@8.7.5",
   "scripts": {
+    "prisma:generate": "prisma generate",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -53,6 +53,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.5.0",
+    "jest-mock-extended": "^3.0.5",
     "prettier": "^3.0.0",
     "prisma": "^5.3.0",
     "source-map-support": "^0.5.21",

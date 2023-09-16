@@ -2,9 +2,9 @@ import { Subject, of, timer } from 'rxjs';
 import { Answer, Game, Question, User } from '../../src/generated/client';
 import { UserSubject } from './user.subject';
 import { ChatUserstate, Client } from 'tmi.js';
-import { PrismaService } from 'src/app.service';
+import { PrismaService } from '../app.service';
 import * as moment from 'moment';
-import { EndCommand } from 'src/commands';
+import { EndCommand } from '../commands';
 import * as _ from 'lodash';
 import { ChannelSubject } from './channel.subject';
 

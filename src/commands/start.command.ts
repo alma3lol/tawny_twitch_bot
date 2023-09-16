@@ -1,5 +1,5 @@
-import { Command } from 'src/command.class';
-import { GameSubject } from 'src/subjects';
+import { Command } from '../command.class';
+import { GameSubject } from '../subjects';
 
 export class StartCommand extends Command {
   async Command() {

@@ -1,29 +1,24 @@
-import { Command } from 'src/command.class';
+import { Command } from '../command.class';
 
 export class HelpCommand extends Command {
   Command() {
     if (this.args.length === 0)
       this.channelSubject.next(
-        
         `@${this.user.username} call 911 instead of chatting here!`,
       );
     else {
       switch (this.args[0]) {
         case 'add':
           this.channelSubject.next(
-            
             `!add question (clue|options) <question>:<clue|options>:answer`,
           );
           this.channelSubject.next(
-            
             `You can add a 'clue' question which has a clue of the answer, or an options question which provides options instead.`,
           );
           this.channelSubject.next(
-            
             `Ex: !add question clue an artist and a painter with a famous painting:he's italian:Leonardo da Vinci`,
           );
           this.channelSubject.next(
-            
             `Ex: !add question options an artist and a painter with a famous painting:Leonardo da Vinci,Niccolo Machiavelli,Albert Einstein:Leonardo da Vinci`,
           );
           break;
@@ -38,7 +33,6 @@ export class HelpCommand extends Command {
         case 'end':
           this.channelSubject.next(`!end (<name>|last)`);
           this.channelSubject.next(
-            
             `End a game named <name> or the last game started.`,
           );
           break;
