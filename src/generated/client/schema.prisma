@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Token {
+  id            Int      @id @default(autoincrement())
+  access_token  String   @unique
+  expires_at    DateTime
+  refresh_token String   @unique
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  username  String  @unique
+  following Boolean @default(false)
+  games     Game[]
+  scores    Score[]
+}
+
+model Game {
+  id        Int      @id @default(autoincrement())
+  channel   String
+  starter   User     @relation(fields: [startedBy], references: [id])
+  startedBy Int
+  type      GameType
+  ended     Boolean  @default(false)
+  scores    Score[]
+}
+
+enum GameType {
+  Questions
+}
+
+model Score {
+  id      Int  @id @default(autoincrement())
+  game    Game @relation(fields: [game_id], references: [id])
+  game_id Int
+  user    User @relation(fields: [user_id], references: [id])
+  user_id Int
+  score   Int  @default(0)
+}
+
+model Question {
+  id       Int         @id @default(autoincrement())
+  question String      @unique
+  timer    Int         @default(60)
+  type     QuesionType
+  clue     String?
+  answer   Answer?
+}
+
+enum QuesionType {
+  WITH_CLUE
+  WITH_OPTIONS
+}
+
+model Answer {
+  id         Int      @id @default(autoincrement())
+  answer     String
+  question   Question @relation(fields: [quesion_id], references: [id])
+  quesion_id Int      @unique
+  options    String
+}
