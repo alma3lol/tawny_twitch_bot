@@ -18,7 +18,10 @@ export class AddCommand extends Command {
                 answer: { create: { answer, options: '' } },
               },
             });
-            this.channelSubject.next(`Question added.`);
+            this.channelSubject.next({
+              type: 'DELAYED_MESSAGE',
+              msg: `Question added.`,
+            });
             break;
           case 'options':
             await this.prismaService.question.create({
@@ -38,19 +41,24 @@ export class AddCommand extends Command {
                 },
               },
             });
-            this.channelSubject.next(`Question added.`);
+            this.channelSubject.next({
+              type: 'DELAYED_MESSAGE',
+              msg: `Question added.`,
+            });
             break;
           default:
-            this.channelSubject.next(
-              `Question type (${this.args[1]}) is invalid. Try !help add.`,
-            );
+            this.channelSubject.next({
+              type: 'DELAYED_MESSAGE',
+              msg: `Question type (${this.args[1]}) is invalid. Try !help add.`,
+            });
             break;
         }
         break;
       default:
-        this.channelSubject.next(
-          `Add type (${this.args[0]}) is invalid. Try !help add.`,
-        );
+        this.channelSubject.next({
+          type: 'DELAYED_MESSAGE',
+          msg: `Add type (${this.args[0]}) is invalid. Try !help add.`,
+        });
         break;
     }
   }

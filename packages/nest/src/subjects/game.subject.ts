@@ -79,29 +79,41 @@ export class GameSubject extends Subject<Question & { answer: Answer }> {
       }
       of(...msgs).subscribe({
         next: (msg) => {
-          this.channelSubject.next(msg);
+          this.channelSubject.next({ type: 'DELAYED_MESSAGE', msg: msg });
         },
         complete: () => {
-          this.channelSubject.next(
-            `You should answer ${moment().add(question.timer, 's').fromNow()}.`,
-          );
+          this.channelSubject.next({
+            type: 'DELAYED_MESSAGE',
+            msg: `You should answer ${moment()
+              .add(question.timer, 's')
+              .fromNow()}.`,
+          });
           timer(Math.floor(question.timer / 2) * 1000).subscribe(() => {
             this.client.say(
               this.channelSubject.channel,
               `Half the time passed. Know the answer yet?`,
             );
             msgs.forEach((msg) => {
-              this.channelSubject.next(msg);
+              this.channelSubject.next({ type: 'DELAYED_MESSAGE', msg: msg });
             });
           });
           timer(question.timer * 1000).subscribe(async () => {
-            this.channelSubject.next(`Time's up for this question.`);
+            this.channelSubject.next({
+              type: 'DELAYED_MESSAGE',
+              msg: `Time's up for this question.`,
+            });
             try {
               const q = await this.pickAQuestion();
-              this.channelSubject.next(`Next question...`);
+              this.channelSubject.next({
+                type: 'DELAYED_MESSAGE',
+                msg: `Next question...`,
+              });
               this.next(q);
             } catch (_e) {
-              this.channelSubject.next(`That was the last question.`);
+              this.channelSubject.next({
+                type: 'DELAYED_MESSAGE',
+                msg: `That was the last question.`,
+              });
               this.players.forEach((player) => {
                 player.next('SAVE_SCORE');
               });

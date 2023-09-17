@@ -65,4 +65,9 @@ export class AppController {
       });
     }
   }
+
+  @Get('/overlay')
+  async overlay(@Res() res: Response) {
+    return res.render('overlay', {});
+  }
 }

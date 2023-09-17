@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Axios from 'axios';
-import { Client } from 'tmi.js';
 import { PrismaClient } from '../src/generated/client';
-import { BotSubject } from './subjects';
+import { Bot } from './bot.class';
 
 export type TwitchOAuth2TokenResponse = {
   access_token: string;
@@ -75,19 +74,7 @@ export class AppService {
 
   startBot = async (access_token: string, prismaService: PrismaService) => {
     if (process.env.NODE_ENV === 'test') return;
-    const client = new Client({
-      options: { debug: true },
-      identity: {
-        username: process.env.BOT_USERNAME,
-        password: access_token,
-      },
-      channels: process.env.CHANNEL.split(','),
-    });
-
-    client.connect();
-
-    // const botSubject = new BotSubject(client, prismaService);
-    new BotSubject(client, prismaService);
+    await Bot.getBot(access_token, prismaService);
   };
 }
 

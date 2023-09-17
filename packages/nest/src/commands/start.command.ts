@@ -9,17 +9,24 @@ export class StartCommand extends Command {
         try {
           const count = await this.prismaService.question.count();
           if (count === 0) {
-            this.channelSubject.next(
-              `There are no questions yet! @${this.user.username} please add some questions with '!add question <...>'. See !help add`,
-            );
+            this.channelSubject.next({
+              type: 'DELAYED_MESSAGE',
+              msg: `There are no questions yet! @${this.user.username} please add some questions with '!add question <...>'. See !help add`,
+            });
             return;
           }
           const currentGame = await this.prismaService.game.findFirst({
             where: { ended: false },
           });
           if (currentGame === null) throw new Error();
-          this.channelSubject.next(`A game is already in progress`);
-          this.channelSubject.next(`You can end the current game with !end`);
+          this.channelSubject.next({
+            type: 'DELAYED_MESSAGE',
+            msg: `A game is already in progress`,
+          });
+          this.channelSubject.next({
+            type: 'DELAYED_MESSAGE',
+            msg: `You can end the current game with !end`,
+          });
         } catch (_e) {
           try {
             const game = await this.prismaService.game.create({
@@ -35,7 +42,10 @@ export class StartCommand extends Command {
               },
               include: { starter: true },
             });
-            this.channelSubject.next(`Starting game ${game.type}.`);
+            this.channelSubject.next({
+              type: 'DELAYED_MESSAGE',
+              msg: `Starting game ${game.type}.`,
+            });
             const question = await this.pickAQuestion();
             const gameSubject = new GameSubject(
               game,
@@ -48,16 +58,18 @@ export class StartCommand extends Command {
             gameSubject.next(question);
           } catch (e) {
             console.log(e);
-            this.channelSubject.next(
-              `Failed to create the game! Check console for info.`,
-            );
+            this.channelSubject.next({
+              type: 'DELAYED_MESSAGE',
+              msg: `Failed to create the game! Check console for info.`,
+            });
           }
         }
         break;
       default:
-        this.channelSubject.next(
-          `Game type (${gameType}) is invalid. Valid type are: [questions].`,
-        );
+        this.channelSubject.next({
+          type: 'DELAYED_MESSAGE',
+          msg: `Game type (${gameType}) is invalid. Valid type are: [questions].`,
+        });
         break;
     }
   }
