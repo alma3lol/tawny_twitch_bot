@@ -1,21 +1,31 @@
 'use client';
 
-import { TOGGLE_BOT_CONNECTED, useAppSelector, wrapper } from '@/redux';
+import { TOGGLE_BOT_CONNECTED, useAppDispatch, useAppSelector, wrapper } from '@/redux';
 import { AppService, PrismaService } from '@/services';
 import { SocketIOServer } from '@/socket.io';
 import { BotSubject } from '@/subjects';
-import { InferGetStaticPropsType } from 'next';
+import { CONNREFUSED } from 'dns';
+import { InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { useSearchParams } from 'next/navigation';
-import { END } from 'redux-saga';
+import { useEffect } from 'react';
+import { io } from 'socket.io-client';
 
-export default function Home({ }: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function Home({ }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	const searchParams = useSearchParams();
 	if (searchParams !== null) {
 		const whaaaat = searchParams.get('whaaaat');
 		if (whaaaat !== null) console.log(whaaaat);
 	}
 	const isBotConnected = useAppSelector(state => state.BOT.connected);
+	const dispatch = useAppDispatch();
+	useEffect(() => {
+		const ioSocket = io('ws://localhost:4000/');
+		ioSocket.on('connected', (connected) => {
+			console.log({ connected });
+			dispatch(TOGGLE_BOT_CONNECTED(connected));
+		});
+	});
 	return (
 		<div className= 'h-full w-full text-center flex' >
 			<Head>
@@ -27,12 +37,8 @@ export default function Home({ }: InferGetStaticPropsType<typeof getStaticProps>
 	)
 }
 
-export const getStaticProps  = wrapper.getStaticProps<{ client_id?: string }>((store) => async ({  }) => {
+export const getServerSideProps  = wrapper.getServerSideProps<{ client_id?: string }>(() => async ({  }) => {
 	try {
-		const server = SocketIOServer.getServer()
-		server.on('connection', (socket) => {
-			console.log(socket.id);
-		});
 		const prismaService = new PrismaService();
 		const appService = new AppService();
 		const token = await prismaService.token.findFirst();
@@ -52,16 +58,19 @@ export const getStaticProps  = wrapper.getStaticProps<{ client_id?: string }>((s
 			});
 			botSubject = await appService.startBot(result.access_token, prismaService);
 		}
-		botSubject?.subscribe({
-			next: (connected) => {
-				console.log({ connected });
-				store.dispatch(TOGGLE_BOT_CONNECTED(connected));
-				store.dispatch(END);
-			},
-			complete: () => {
-				store.dispatch(TOGGLE_BOT_CONNECTED(false));
-				store.dispatch(END);
-			},
+		const server = SocketIOServer.getServer()
+		server.on('connection', (socket) => {
+			console.log(socket.id);
+			socket.emit('welcome');
+			botSubject?.subscribe({
+				next: (connected) => {
+					console.log({ connected });
+					socket.emit('connected', connected);
+				},
+				complete: () => {
+					socket.emit('connected', false);
+				},
+			});
 		});
 		return { props: {} }
 	} catch (_e) {
