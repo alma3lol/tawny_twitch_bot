@@ -6,7 +6,7 @@
         "start:dev": "pnpm -r --stream --workspace-concurrency=5 start:dev",
         "test": "pnpm -r --stream --workspace-concurrency=5 test",
         "build": "pnpm -r --stream --workspace-concurrency=5 build",
-        "prisma:generate": "pnpm -r -filter nest --stream --workspace-concurrency=5 prisma:generate"
+        "prisma:generate": "pnpm -r --filter *backend --stream --workspace-concurrency=5 prisma:generate"
     },
     "engines": {
         "node": ">=18",
