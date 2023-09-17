@@ -7,7 +7,7 @@ function App() {
 			<header className="App-header">
 				<img src={logo} className="App-logo" alt="logo" />
 				<p>
-					Edit <code>src/App.tsx</code> and save to reload please.
+					Edit <code className="bg-black rounded text-white px-2">src/App.tsx</code> and save to reload please.
 				</p>
 			</header>
 		</div>
