@@ -28,7 +28,7 @@ export class AppController {
         });
         this.appService.startBot(result.access_token, this.prismaService);
       }
-      return res.render('success', {});
+      return res.redirect('http://localhost:3000/');
     } catch (_e) {
       return res.render('index', { client_id: process.env.CLIENT_ID });
     }

@@ -36,7 +36,7 @@ export class AppService {
         client_secret: process.env.CLIENT_SECRET,
         code,
         grant_type: 'authorization_code',
-        redirect_uri: 'http://localhost:3000/token',
+        redirect_uri: 'http://localhost:4000/token',
       },
       {
         responseType: 'json',
