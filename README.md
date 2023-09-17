@@ -20,7 +20,7 @@ Follow the instructions:
 -   Copy your Client ID & Secret
     ![Copy your Client ID & Secret](./images/new-secret.png)
 
--   Create a `.env` file in `packages/nest/` with the following content
+-   Create a `.env` file in `packages/backend/` with the following content
     ![Env file](./images/env-file.png)
 
     -   `DATABASE_URL`: database connection string for [Prisma](https://prisma.io)
