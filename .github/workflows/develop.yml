@@ -2,9 +2,9 @@ name: CI (develop)
 
 on:
   push:
-    branches: ['develop']
+    branches: ["develop"]
   pull_request:
-    branches: ['develop']
+    branches: ["develop"]
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          cache: "pnpm"
       - run: pnpm install
       - run: pnpm prisma:generate
       - run: pnpm build

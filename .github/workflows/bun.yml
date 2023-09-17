@@ -1,9 +1,9 @@
 name: Bun CI
 on:
   push:
-    branches: [develop]
+    branches: [bun]
   pull_request:
-    branches: [develop]
+    branches: [bun]
 
 jobs:
   build:
