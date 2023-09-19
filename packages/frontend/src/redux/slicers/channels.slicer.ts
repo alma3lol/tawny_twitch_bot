@@ -13,87 +13,9 @@ export type Channel = {
   joinsAndLeaves: { join: boolean; username: string; timestamp: number }[];
 };
 
-const testChannels: Channel[] = [
-  {
-    channel: '#fakechannel',
-    joinsAndLeaves: [
-      {
-        join: true,
-        username: 'fakeuser',
-        timestamp: moment('1994-09-14').unix(),
-      },
-      {
-        join: true,
-        username: 'fakeuser',
-        timestamp: moment('1994-09-14').unix(),
-      },
-      {
-        join: true,
-        username: 'fakeuser',
-        timestamp: moment('1994-09-14').unix(),
-      },
-      {
-        join: true,
-        username: 'fakeuser',
-        timestamp: moment('1994-09-14').unix(),
-      },
-      {
-        join: true,
-        username: 'fakeuser',
-        timestamp: moment('1994-09-14').unix(),
-      },
-      {
-        join: true,
-        username: 'fakeuser',
-        timestamp: moment('1994-09-14').unix(),
-      },
-      {
-        join: true,
-        username: 'fakeuser',
-        timestamp: moment('1994-09-14').unix(),
-      },
-    ],
-    mod: true,
-    users: [
-      'fakeuser0',
-      'fakeuser1',
-      'fakeuser2',
-      'fakeuser3',
-      'fakeuser4',
-      'fakeuser5',
-      'fakeuser6',
-      'fakeuser7',
-      'fakeuser8',
-      'fakeuser9',
-      'fakeuser10',
-      'fakeuser11',
-      'fakeuser12',
-      'fakeuser13',
-      'fakeuser14',
-      'fakeuser15',
-      'fakeuser16',
-      'fakeuser17',
-      'fakeuser18',
-      'fakeuser19',
-    ],
-    joined: true,
-    messages: [
-      {
-        timestamp: moment('1994-09-14').add(5, 'm').unix(),
-        message: 'Fake message',
-        user: {
-          username: 'fakeuser',
-          "display-name": 'Fake User',
-          color: '#000fff',
-        }
-      }
-    ]
-  }
-];
-
 export const channelsSlicer = createSlice({
   name: "CHANNELS",
-  initialState: testChannels, // [] as Channel[],
+  initialState: [] as Channel[],
   reducers: {
     BOT_JOINED: (state, action: PayloadAction<string>) => {
       let channelFound = false;

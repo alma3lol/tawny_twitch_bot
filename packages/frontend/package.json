@@ -50,6 +50,7 @@
   "devDependencies": {
     "@types/lodash": "^4.14.198",
     "@types/tmi.js": "^1.8.4",
-    "tailwind": "^4.0.0"
+    "tailwind": "^4.0.0",
+    "tailwind-scrollbar": "^3.0.5"
   }
 }

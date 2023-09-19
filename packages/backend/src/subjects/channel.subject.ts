@@ -40,10 +40,10 @@ export class ChannelSubject extends Subject<
     this.subscribe((msg) => {
       switch (msg.type) {
         case 'INSTANT_MESSAGE':
-          this.messageQueue.push(msg.msg);
+          this.client.say(this.channel, msg.msg);
           break;
         case 'DELAYED_MESSAGE':
-          this.client.say(this.channel, msg.msg);
+          this.messageQueue.push(msg.msg);
           break;
         case 'USER_JOINED':
           if (!_.includes(this.users, msg.username.toLowerCase()))

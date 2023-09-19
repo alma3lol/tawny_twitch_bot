@@ -7,7 +7,6 @@ import {
 import * as _ from 'lodash';
 import { Server, Socket } from 'socket.io';
 import { Bot } from 'src/bot.class';
-// dummy change
 
 @WebSocketGateway({
   cors: {
@@ -25,7 +24,11 @@ export class EventsGateway implements OnGatewayConnection {
 
   @SubscribeMessage('isBotConnected')
   handleIsBotConnected(client: Socket) {
-    client.emit('isBotConnected', Bot.isBotInitiated());
+    client.emit(
+      'isBotConnected',
+      Bot.isBotInitiated(),
+      Bot.getBotOrNull()?.client.getUsername() || undefined,
+    );
     if (!!_.find(this.botSubjectSubscribedClient, client.id)) return;
     const botSubject = Bot.getBotOrNull();
     if (botSubject === null) return;
@@ -34,7 +37,11 @@ export class EventsGateway implements OnGatewayConnection {
       const { type, ...rest } = event;
       switch (type) {
         case 'BOT_CONNECTED':
-          client.emit('isBotConnected', event.connected);
+          client.emit(
+            'isBotConnected',
+            event.connected,
+            botSubject.client.getUsername(),
+          );
           break;
         case 'CHAT_MESSAGE':
           client.emit('chat', rest);
@@ -80,7 +87,12 @@ export class EventsGateway implements OnGatewayConnection {
           console.log(e);
           return false;
         }
-        break;
+      case 'chat':
+        const [something] = await botSubject.client.say(
+          payload.args[0],
+          payload.args[1],
+        );
+        return something;
     }
   }
 }

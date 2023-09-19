@@ -14,6 +14,7 @@ import {
   USER_LEFT,
   SET_SUBMITTING,
   SET_INFO,
+  SET_BOT_USERNAME,
 } from "./redux";
 import { ChatUserstate } from "tmi.js";
 import { ChannelComponent } from "./components";
@@ -34,15 +35,25 @@ function App() {
   const dispatch = useAppDispatch();
   const isBotConnected = useAppSelector((state) => state.BOT.connected);
   const channels = useAppSelector((state) => state.CHANNELS);
-  const { success: isSuccess, successMessage, error: isError, errorMessage, info: isInfo, infoMessage, submitting: isSubmitting } = useAppSelector((state) => state.APP);
+  const {
+    success: isSuccess,
+    successMessage,
+    error: isError,
+    errorMessage,
+    info: isInfo,
+    infoMessage,
+    submitting: isSubmitting,
+  } = useAppSelector((state) => state.APP);
   const [socket, setSocket] = useState<Socket | null>(null);
   const { enqueueSnackbar } = useSnackbar();
   useEffect(() => {
     if (process.env.NODE_ENV === "test") return;
     const client = io(`ws://localhost:4000/`);
-    client.on("isBotConnected", (connected) => {
-      dispatch(SET_INFO(`Bot ${ connected ? 'connected': 'disconnected' }`));
+    client.on("isBotConnected", (connected, username) => {
+      console.log({ connected, username });
+      dispatch(SET_INFO(`Bot ${connected ? "connected" : "disconnected"}`));
       dispatch(TOGGLE_BOT_CONNECTED(connected));
+      dispatch(SET_BOT_USERNAME(username));
     });
     client.on(
       "chat",
