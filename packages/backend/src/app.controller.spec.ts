@@ -28,7 +28,7 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "success"', async () => {
+    it('should return "index"', async () => {
       const token: Token = {
         id: 0,
         refresh_token: 'refresh_token',
@@ -47,7 +47,7 @@ describe('AppController', () => {
       const res = {
         render: (template: string, _params: any) => template, // eslint-disable-line
       };
-      expect(await appController.main(res as any)).toBe('success');
+      expect(await appController.main(res as any)).toBe('index');
     });
   });
 });

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/websockets';
 import * as _ from 'lodash';
 import { Server, Socket } from 'socket.io';
-import { Bot } from 'src/bot.class';
+import { Bot } from '../bot.class';
 
 @WebSocketGateway({
   cors: {
