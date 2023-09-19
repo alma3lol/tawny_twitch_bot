@@ -11,12 +11,21 @@
     "@types/node": "^20.6.2",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
+    "flowbite": "^1.8.1",
+    "flowbite-react": "^0.6.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "notistack": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.11.0",
     "react-redux": "^8.1.2",
     "react-scripts": "5.0.1",
     "react-use": "^17.4.0",
     "redux": "^4.2.1",
+    "redux-saga": "^1.2.3",
+    "socket.io-client": "^4.7.2",
+    "tmi.js": "^1.8.5",
     "typescript": "^5.2.2",
     "web-vitals": "^3.4.0"
   },
@@ -39,6 +48,8 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.198",
+    "@types/tmi.js": "^1.8.4",
     "tailwind": "^4.0.0"
   }
 }

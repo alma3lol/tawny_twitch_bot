@@ -27,6 +27,7 @@ export class ChannelSubject extends Subject<
 > {
   private messageQueue: string[] = [];
   private users: string[] = [];
+  private mod: boolean = false;
   constructor(
     private readonly client: Client,
     readonly channel: string,
@@ -60,4 +61,10 @@ export class ChannelSubject extends Subject<
   }
 
   getUsers = () => this.users;
+
+  setMod = (mod: boolean) => {
+    this.mod = mod;
+  };
+
+  getMod = () => this.mod;
 }

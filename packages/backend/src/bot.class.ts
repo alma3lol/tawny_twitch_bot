@@ -23,4 +23,6 @@ export class Bot {
     this.botSubject = new BotSubject(client, prismaService);
     return this.botSubject;
   };
+  static isBotInitiated = () => this.botSubject !== null;
+  static getBotOrNull = () => this.botSubject;
 }
